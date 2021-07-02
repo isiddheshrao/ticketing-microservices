@@ -1,10 +1,8 @@
 import express, { Request, Response } from 'express'
 import jwt from 'jsonwebtoken';
-import { body, validationResult } from 'express-validator'
-
-import { RequestValidationError } from '../errors/request-validation';
-// import { DatabaseConnectionError } from '../errors/database-connection-errror';
+import { body } from 'express-validator'
 import { BadRequestError } from '../errors/bad-request-error';
+import { validateRequest } from '../middlewares/validate-request';
 
 import { User } from '../models/user';
 
@@ -18,13 +16,10 @@ router.post('/api/users/signup', [
   .trim()
   .isLength({min: 4, max: 10})
   .withMessage('Password should be minimum 4 & max 20 characters')
-], async (req: Request, res: Response) => {
-  
-  const errors = validationResult(req)
-  
-  if (!errors.isEmpty()) {
-    throw new RequestValidationError(errors.array())
-  }
+],
+validateRequest,
+async (req: Request, res: Response) => 
+{
   const { email, password } = req.body
   const ExistingUser = await User.findOne({ email })
 
@@ -39,7 +34,7 @@ router.post('/api/users/signup', [
   const userJwt = jwt.sign({
     id: user.id,
     email: user.email
-  }, 'privateKey')
+  }, process.env.JWT_KEY!)
 
   req.session = {
     jwt: userJwt
