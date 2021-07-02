@@ -8,8 +8,7 @@ import { currentUserRouter } from './routes/current-user';
 import { signInRouter } from './routes/signin';
 import { SignOutRouter } from './routes/signout';
 import { SignUpRouter } from './routes/signup';
-import { errorHandler } from './middlewares/error-handler';
-import { NotfoundError } from './errors/not-found-error';
+import { errorHandler, NotfoundError } from '@srticketapp/common';
 
 const app = express();
 app.set('trust proxy', true)
